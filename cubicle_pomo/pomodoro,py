@@ -1,0 +1,63 @@
+import asyncio
+
+class PomodoroTimer:
+    def __init__(self, work_duration=25, short_break=5, long_break=15, cycles=4):
+        self.work_duration = work_duration
+        self.short_break = short_break
+        self.long_break = long_break
+        self.cycles = cycles
+        self.current_cycle = 0
+        self.is_running = False
+
+    async def start(self):
+        if self.is_running:
+            print("Pomodoro timer is already running.")
+            return
+        self.is_running = True
+        while self.is_running and self.current_cycle < self.cycles:
+            await self._work_session()
+            if not self.is_running:
+                break
+            if self.current_cycle < self.cycles - 1:
+                await self._short_break()
+            else:
+                await self._long_break()
+            self.current_cycle += 1
+        self.is_running = False
+
+    async def _work_session(self):
+        print(f"Starting work session for {self.work_duration} minutes.")
+        await asyncio.sleep(self.work_duration * 60)
+        print("Work session ended.")
+
+    async def _short_break(self):
+        print(f"Starting short break for {self.short_break} minutes.")
+        await asyncio.sleep(self.short_break * 60)
+        print("Short break ended.")
+
+    async def _long_break(self):
+        print(f"Starting long break for {self.long_break} minutes.")
+        await asyncio.sleep(self.long_break * 60)
+        print("Long break ended.")
+
+    def stop(self):
+        self.is_running = False
+        print("Pomodoro timer stopped.")
+    
+    async def status(self):
+        if self.is_running:
+            return f"Pomodoro timer is running. Current cycle: {self.current_cycle + 1}/{self.cycles}"
+        else:
+            print("Pomodoro timer is not running.")
+
+    
+
+
+# Example usage:
+# if __name__ == "__main__":
+#     pomodoro = PomodoroTimer(work_duration=0.1, short_break=0.05, long_break=0.1, cycles=2)  # Short durations for testing
+
+#     async def main():
+#         await pomodoro.start()
+
+#     asyncio.run(main())
