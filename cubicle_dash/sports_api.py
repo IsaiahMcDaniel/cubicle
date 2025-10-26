@@ -1,4 +1,3 @@
-# espn_fetch_raw.py
 import requests, datetime as dt, json
 
 def week_range():
@@ -17,7 +16,7 @@ def fetch_and_save(url, filename, params=None):
         json.dump(data, f, indent=2, ensure_ascii=False)
     print(f"Saved {filename}")
 
-def main():
+def update():
     dates = week_range()
 
     # ---- SCOREBOARDS ----
@@ -35,7 +34,7 @@ def main():
     for name, (url, params) in scoreboards.items():
         fetch_and_save(url, fr"cubicle_dash\sports\scoreboards\{name}_scoreboard.json", params)
 
-    # ---- STANDINGS ----
+    # ---- STANDINGS/RANKINGS ----
     standings = {
         "nfl": f"https://site.web.api.espn.com/apis/v2/sports/football/nfl/standings",
         "nba": f"https://site.web.api.espn.com/apis/v2/sports/basketball/nba/standings",
@@ -46,5 +45,3 @@ def main():
     for name, url in standings.items():
         fetch_and_save(url, fr"cubicle_dash\sports\standings\{name}_standings.json", {"season": dt.date.today().year})
 
-if __name__ == "__main__":
-    main()
