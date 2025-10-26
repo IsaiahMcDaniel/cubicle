@@ -22,12 +22,6 @@ def safe(d, *path, default=None):
             return default
     return d
 
-def primary_logo(team):
-    logos = safe(team, "logos", default=[])
-    if logos and isinstance(logos, list):
-        return logos[0].get("href")
-    return None
-
 def ensure_schema(con):
     cur = con.cursor()
     cur.executescript("""
@@ -85,7 +79,6 @@ def load_scoreboard(cur, path: Path, league: str):
         home = next((c for c in comps if c.get("homeAway") == "home"), comps[0])
         away = next((c for c in comps if c.get("homeAway") == "away"), comps[1])
         ht, at = home.get("team") or {}, away.get("team") or {}
-
         cur.execute(
             """INSERT OR REPLACE INTO games
                (league,event_id,start,status,
@@ -100,11 +93,11 @@ def load_scoreboard(cur, path: Path, league: str):
                 at.get("displayName"),
                 at.get("abbreviation"),
                 int(away.get("score") or 0),
-                primary_logo(at),
+                at.get("logo", None),
                 ht.get("displayName"),
                 ht.get("abbreviation"),
                 int(home.get("score") or 0),
-                primary_logo(ht),
+                ht.get("logo", None),
             ),
         )
 
@@ -130,7 +123,7 @@ def load_rankings(cur, path: Path, sport: str):
                     team.get("displayName") or team.get("nickname"),
                     r.get("points"),
                     r.get("firstPlaceVotes"),
-                    primary_logo(team),
+                    team.get("logo", None),
                 ),
             )
 
@@ -168,4 +161,4 @@ def update():
     con.commit()
     con.close()
     print(f"Reloaded fresh data into {DB_PATH.resolve()}")
-
+update()
